@@ -2,7 +2,7 @@
 A [bb8](https://docs.rs/bb8) asynchronous connection pool implementation for [MongoDB](https://www.mongodb.com/).
 
 ## Current Release
-[![docs.rs](https://docs.rs//badge.svg)](https://docs.rs/bb8-mongodb)
+[![docs.rs](https://docs.rs/bb8-mongodb/badge.svg)](https://docs.rs/bb8-mongodb)
 [![Crates.io](https://img.shields.io/crates/v/bb8-mongodb.svg)](https://crates.io/crates/bb8-mongodb)
 [![Crates.io](https://img.shields.io/crates/l/bb8-mongodb.svg)](https://crates.io/crates/bb8-mongodb)
 [![Crates.io](https://img.shields.io/crates/d/bb8-mongodb.svg)](https://crates.io/crates/bb8-mongodb)
@@ -10,6 +10,8 @@ A [bb8](https://docs.rs/bb8) asynchronous connection pool implementation for [Mo
 [![CI](https://github.com/rustyhorde/bb8-mongodb/actions/workflows/main.yml/badge.svg)](https://github.com/rustyhorde/bb8-mongodb/actions)
 [![sponsor](https://img.shields.io/github/sponsors/crazysacx?logo=github-sponsors)](https://github.com/sponsors/CraZySacX)
 
+## MSRV
+The minimum supported version of Rust is 1.62.0.
 ## Example Usage
 See the documentation at [docs.rs](https://docs.rs/bb8-mongodb) for example usage
 
