@@ -52,3 +52,30 @@ impl ManageConnection for Mongodb {
         false
     }
 }
+
+#[cfg(test)]
+mod test {
+    use super::Mongodb;
+    use anyhow::Result;
+    use bb8::Pool;
+    use mongodb::options::{ClientOptions, Credential};
+
+    #[tokio::test]
+    async fn new_works() -> Result<()> {
+        let mut client_options = ClientOptions::parse("mongodb://somedburi:27017").await?;
+        client_options.app_name = Some("app".to_string());
+        client_options.credential = Some(
+            Credential::builder()
+                .username(Some("dbuser".to_string()))
+                .password(Some("dbpass".to_string()))
+                .source(Some("dbauthsource".to_string()))
+                .build(),
+        );
+
+        // Setup the `bb8-mongodb` connection manager
+        let connection_manager = Mongodb::new(client_options, "db");
+        // Setup the `bb8` connection pool
+        let _pool = Pool::builder().build(connection_manager).await?;
+        Ok(())
+    }
+}
