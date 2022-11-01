@@ -13,9 +13,9 @@ repository = "https://github.com/rustyhorde/bb8-mongodb"
 version = "0.2.0"
 
 [dependencies]
-anyhow = "1.0.58"
-async-trait = "0.1.56"
+anyhow = "1.0.66"
+async-trait = "0.1.58"
 bb8 = "0.8.0"
-mongodb = "2.3.0"
-thiserror = "1.0.31"
-tokio = { version = "1.20.0", features = ["macros", "rt-multi-thread"] }
+mongodb = "2.3.1"
+thiserror = "1.0.37"
+tokio = { version = "1.21.2", features = ["full"] }
