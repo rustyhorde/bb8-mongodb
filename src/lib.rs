@@ -109,7 +109,6 @@
     overlapping_range_endpoints,
     path_statements,
     pointer_structural_match,
-    private_in_public,
     redundant_semicolons,
     renamed_and_removed_lints,
     rust_2021_incompatible_closure_captures,
