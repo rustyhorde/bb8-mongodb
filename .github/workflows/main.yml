@@ -146,7 +146,9 @@ jobs:
       - name: 🙊 Code Coverage 🙊
         run: cargo tarpaulin --out Xml
       - name: 🙊 Upload Code Coverage 🙊
-        uses: codecov/codecov-action@v3
+        uses: codecov/codecov-action@v4.0.0-beta.3
+        env:
+          token: ${{ secrets.CODECOV_TOKEN}}
         with:
           files: ./cobertura.xml
   test-macos:
