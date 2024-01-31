@@ -9,7 +9,7 @@
 //! A [`bb8`](https://docs.rs/bb8) connection manager for a [`MongoDB`](https://www.mongodb.com/) connection pool
 //!
 //! ** NOTE ** - The `bb8` version has been pinned to 0.8.1 for now due to bugs causing tokio timeouts.
-//! 
+//!
 //! # Example
 //! ```
 //! # use anyhow::Result;
