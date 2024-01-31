@@ -1,6 +1,5 @@
 on:
-  # Trigger the workflow on push to master or any pull request
-  # Ignore all tags
+  workflow_dispatch:
   push:
     branches:
       - master
