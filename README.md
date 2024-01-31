@@ -11,7 +11,7 @@ A [bb8](https://docs.rs/bb8) asynchronous connection pool implementation for [Mo
 [![sponsor](https://img.shields.io/github/sponsors/crazysacx?logo=github-sponsors)](https://github.com/sponsors/CraZySacX)
 
 ## MSRV
-The minimum supported version of Rust is 1.63.0.
+The minimum supported version of Rust is 1.67.0.
 ## Example Usage
 See the documentation at [docs.rs](https://docs.rs/bb8-mongodb) for example usage
 
