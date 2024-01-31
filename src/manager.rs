@@ -58,7 +58,10 @@ mod test {
     use super::Mongodb;
     use anyhow::Result;
     use bb8::Pool;
-    use mongodb::{bson::doc, options::{ClientOptions, Credential}};
+    use mongodb::{
+        bson::doc,
+        options::{ClientOptions, Credential},
+    };
     use std::env;
 
     #[tokio::test]

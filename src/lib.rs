@@ -31,7 +31,7 @@
 //!         .password(password)
 //!         .build(),
 //! );
-//! 
+//!
 //! // Setup the `bb8-mongodb` connection manager
 //! let connection_manager = MongodbConnectionManager::new(client_options, "admin");
 //! // Setup the `bb8` connection pool
