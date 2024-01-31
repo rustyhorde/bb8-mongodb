@@ -141,9 +141,17 @@ jobs:
         continue-on-error: true
         run: cargo binstall --no-confirm --no-symlinks cargo-all-features
       - name: 🧪 Test 🧪
+        env:
+          BB8_MONGODB_URL: ${{ secrets.BB8_MONGODB_URL }}
+          BB8_MONGODB_USER: ${{ secrets.BB8_MONGODB_USER }}
+          BB8_MONGODB_PASSWORD: ${{ secrets.BB8_MONGODB_PASSWORD }}
         run: cargo test-all-features
       - name: 🙊 Code Coverage 🙊
         run: cargo tarpaulin --out Xml
+        env:
+          BB8_MONGODB_URL: ${{ secrets.BB8_MONGODB_URL }}
+          BB8_MONGODB_USER: ${{ secrets.BB8_MONGODB_USER }}
+          BB8_MONGODB_PASSWORD: ${{ secrets.BB8_MONGODB_PASSWORD }}
       - name: 🙊 Upload Code Coverage 🙊
         uses: codecov/codecov-action@v4-beta
         env:
@@ -195,6 +203,10 @@ jobs:
         continue-on-error: true
         run: cargo binstall --no-confirm --no-symlinks cargo-all-features
       - name: 🧪 Test 🧪
+        env:
+          BB8_MONGODB_URL: ${{ secrets.BB8_MONGODB_URL }}
+          BB8_MONGODB_USER: ${{ secrets.BB8_MONGODB_USER }}
+          BB8_MONGODB_PASSWORD: ${{ secrets.BB8_MONGODB_PASSWORD }}  
         run: cargo test-all-features
   test-windows:
     name: 🧪 Windows 🧪
@@ -265,4 +277,8 @@ jobs:
         continue-on-error: true
         run: cargo binstall --no-confirm --no-symlinks cargo-all-features
       - name: 🧪 Test 🧪
+        env:
+          BB8_MONGODB_URL: ${{ secrets.BB8_MONGODB_URL }}
+          BB8_MONGODB_USER: ${{ secrets.BB8_MONGODB_USER }}
+          BB8_MONGODB_PASSWORD: ${{ secrets.BB8_MONGODB_PASSWORD }} 
         run: cargo test-all-features
