@@ -58,24 +58,30 @@ mod test {
     use super::Mongodb;
     use anyhow::Result;
     use bb8::Pool;
-    use mongodb::options::{ClientOptions, Credential};
+    use mongodb::{bson::doc, options::{ClientOptions, Credential}};
+    use std::env;
 
     #[tokio::test]
     async fn new_works() -> Result<()> {
-        let mut client_options = ClientOptions::parse("mongodb://somedburi:27017").await?;
-        client_options.app_name = Some("app".to_string());
+        let mut client_options = ClientOptions::parse(env::var("BB8_MONGODB_URL")?).await?;
         client_options.credential = Some(
             Credential::builder()
-                .username(Some("dbuser".to_string()))
-                .password(Some("dbpass".to_string()))
-                .source(Some("dbauthsource".to_string()))
+                .username(env::var("BB8_MONGODB_USER").ok())
+                .password(env::var("BB8_MONGODB_PASSWORD").ok())
                 .build(),
         );
 
         // Setup the `bb8-mongodb` connection manager
-        let connection_manager = Mongodb::new(client_options, "db");
+        let connection_manager = Mongodb::new(client_options, "admin");
         // Setup the `bb8` connection pool
-        let _pool = Pool::builder().build(connection_manager).await?;
+        let pool = Pool::builder().build(connection_manager).await?;
+        // Connect
+        let conn = pool.get().await?;
+        assert_eq!(conn.name(), "admin");
+        // Run a command
+        let doc = conn.run_command(doc! { "ping": 1 }, None).await?;
+        // Check the result
+        assert_eq!(doc! { "ok": 1 }, doc);
         Ok(())
     }
 }

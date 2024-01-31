@@ -15,31 +15,34 @@
 //! # use anyhow::Result;
 //! # use bb8::Pool;
 //! # use bb8_mongodb::MongodbConnectionManager;
-//! # use mongodb::options::{ClientOptions, Credential};
-//! # use std::time::Duration;
+//! # use mongodb::{bson::doc, options::{ClientOptions, Credential}};
+//! # use std::env;
 //! #
 //! # #[tokio::main]
 //! # async fn main() -> Result<()> {
+//! # let url = env::var("BB8_MONGODB_URL")?;
+//! # let user = env::var("BB8_MONGODB_USER").ok();
+//! # let password = env::var("BB8_MONGODB_PASSWORD").ok();
 //! // Setup the MongoDB `ClientOptions`
-//! let mut client_options = ClientOptions::parse("mongodb://somedburi:27017").await?;
-//! client_options.app_name = Some("app".to_string());
+//! let mut client_options = ClientOptions::parse(url).await?;
 //! client_options.credential = Some(
 //!     Credential::builder()
-//!         .username(Some("dbuser".to_string()))
-//!         .password(Some("dbpass".to_string()))
-//!         .source(Some("dbauthsource".to_string()))
+//!         .username(user)
+//!         .password(password)
 //!         .build(),
 //! );
-//! client_options.connect_timeout = Some(Duration::from_secs(3));
-//!
+//! 
 //! // Setup the `bb8-mongodb` connection manager
-//! let connection_manager = MongodbConnectionManager::new(client_options, "db");
-//!
+//! let connection_manager = MongodbConnectionManager::new(client_options, "admin");
 //! // Setup the `bb8` connection pool
 //! let pool = Pool::builder().build(connection_manager).await?;
-//!
-//! // Get a connection from the pool
+//! // Connect
 //! let conn = pool.get().await?;
+//! assert_eq!(conn.name(), "admin");
+//! // Run a command
+//! let doc = conn.run_command(doc! { "ping": 1 }, None).await?;
+//! // Check the result
+//! assert_eq!(doc! { "ok": 1 }, doc);
 //! # Ok(())
 //! # }
 //! ```
