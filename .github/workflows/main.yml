@@ -4,65 +4,99 @@ on:
   push:
     branches:
       - master
-    tags-ignore: '*'
+    tags-ignore:
+      - "*"
   pull_request:
     branches:
-      - '*'
-    tags-ignore: '*'
+      - "*"
   schedule:
     # * is a special character in YAML so you have to quote this string
-    - cron:  '13 3 * * *'
+    - cron: "13 3 * * *"
 
-name: CI
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+env:
+  GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+
+name: 🦀 Rust 🦀
 
 jobs:
   rustfmt:
-    name: ☢️ Formatting ☢️
+    name: 📌 Formatting 📌
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-        with:
-          submodules: recursive
-      - uses: actions-rs/toolchain@v1
-        with:
-          profile: minimal
-          toolchain: stable
-          override: true
-          components: rustfmt
-      - run: cargo fmt --all -- --check
-  lints:
-    name: 🕳️ Lints 🕳️
+      - name: ✅ Checkout ✅
+        uses: actions/checkout@v4
+      - name: ⭕ Rustfmt Check ⭕
+        run: cargo fmt --all -- --check
+  lints-linux:
+    name: 🕳️ Lints Linux 🕳️
     needs: rustfmt
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
         include:
           - os: ubuntu-latest
-            rust: "1.62.0"
-          - os: ubuntu-latest
-            rust: stable
-          - os: ubuntu-latest
-            rust: beta
-          - os: ubuntu-latest
             rust: nightly
-          - os: macos-latest
-            rust: stable
-          - os: windows-latest
-            rust: stable
     steps:
-      - uses: actions/checkout@v2
-        with:
-          submodules: recursive
-      - uses: actions-rs/toolchain@v1
-        with:
-          profile: minimal
-          toolchain: ${{ matrix.rust }}
-          override: true
-          components: clippy
-      - run: cargo clippy --all -- -D warnings
+      - name: ✅ Checkout ✅
+        uses: actions/checkout@v4
+      - name: 🧰 Toolchain 🧰
+        run: |
+          rustup toolchain remove ${{ matrix.rust }}
+          rustup toolchain install ${{ matrix.rust }} --profile default
+          rustup default ${{ matrix.rust }}
+      - name: 📎 Clippy 📎
+        run: |
+          cargo update
+          cargo clippy --all-targets --all-features -- -D warnings
+  lints-macos:
+    name: 🕳️ Lints MacOS 🕳️
+    needs: rustfmt
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        include:
+          - os: macos-latest
+            rust: nightly
+    steps:
+      - name: ✅ Checkout ✅
+        uses: actions/checkout@v4
+      - name: 🧰 Toolchain 🧰
+        run: |
+          rustup toolchain remove ${{ matrix.rust }}
+          rustup toolchain install ${{ matrix.rust }} --profile default --no-self-update
+          rustup default ${{ matrix.rust }}
+      - name: 📎 Clippy 📎
+        run: |
+          cargo update
+          cargo clippy --all-targets --all-features -- -D warnings
+  lints-windows:
+    name: 🕳️ Lints Windows 🕳️
+    needs: rustfmt
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        include:
+          - os: windows-latest
+            rust: nightly
+    steps:
+      - name: ✅ Checkout ✅
+        uses: actions/checkout@v4
+      - name: 🧰 Toolchain 🧰
+        run: |
+          rustup toolchain remove ${{ matrix.rust }}
+          rustup toolchain install ${{ matrix.rust }} --profile default --no-self-update
+          rustup default ${{ matrix.rust }}
+      - name: 📎 Clippy 📎
+        run: |
+          cargo update
+          cargo clippy --all-targets --all-features -- -D warnings
   test-linux:
     name: 🧪 Linux 🧪
-    needs: lints
+    needs: lints-linux
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -92,49 +126,32 @@ jobs:
           rust: nightly
           target: x86_64-unknown-linux-gnu
     steps:
-      - name: ✔️ Checkout ✔️
-        uses: actions/checkout@v2
-        with:
-          submodules: recursive
-      - name: 💵 Cache 💵
-        uses: actions/cache@v2
-        with:
-          path: |
-            ~/.cargo/bin/cargo-tarpaulin*
-            ~/.cargo/bin/cargo-*-all-features*
-          key: ${{ runner.os }}-${{ matrix.rust }}-${{ matrix.target }}-${{ hashFiles('**/Cargo.toml') }}
-      - uses: actions-rs/toolchain@v1
-        name: 🧰 Toolchain 🧰
-        with:
-          profile: minimal
-          toolchain: ${{ matrix.rust }}
-          target: ${{ matrix.target }}
-          override: true
+      - name: ✅ Checkout ✅
+        uses: actions/checkout@v4
+      - name: 🧰 Toolchain 🧰
+        run: |
+          rustup toolchain remove ${{ matrix.rust }}
+          rustup toolchain install ${{ matrix.rust }} --profile default --no-self-update
+          rustup default ${{ matrix.rust }}
+      - name: 💾 Install (cargo-binstall) 💾
+        uses: cargo-bins/cargo-binstall@main
       - name: 💾 Install (cargo-tarpaulin) 💾
-        uses: actions-rs/install@v0.1
-        with:
-          crate: cargo-tarpaulin
-          version: latest
-          use-tool-cache: true
         continue-on-error: true
-      - name: 💾 Install (cargo-all-features) 💾
-        uses: actions-rs/install@v0.1
-        with:
-          crate: cargo-all-features
-          version: latest
-          use-tool-cache: true
+        run: cargo binstall --no-confirm --no-symlinks cargo-tarpaulin
+      - name: 💾 Install (all-features) 💾
         continue-on-error: true
+        run: cargo binstall --no-confirm --no-symlinks cargo-all-features
       - name: 🧪 Test 🧪
         run: cargo test-all-features
       - name: 🙊 Code Coverage 🙊
         run: cargo tarpaulin --out Xml
       - name: 🙊 Upload Code Coverage 🙊
-        uses: codecov/codecov-action@v1
+        uses: codecov/codecov-action@v3
         with:
           files: ./cobertura.xml
   test-macos:
     name: 🧪 MacOS 🧪
-    needs: lints
+    needs: lints-macos
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -164,35 +181,23 @@ jobs:
           rust: nightly
           target: x86_64-apple-ios
     steps:
-      - name: ✔️ Checkout ✔️
-        uses: actions/checkout@v2
-        with:
-          submodules: recursive
-      - name: 💵 Cache 💵
-        uses: actions/cache@v2
-        with:
-          path: |
-            ~/.cargo/bin/cargo-*-all-features*
-          key: ${{ runner.os }}-${{ matrix.rust }}-${{ matrix.target }}-${{ hashFiles('**/Cargo.toml') }}
-      - uses: actions-rs/toolchain@v1
-        name: 🧰 Toolchain 🧰
-        with:
-          profile: minimal
-          toolchain: ${{ matrix.rust }}
-          target: ${{ matrix.target }}
-          override: true
-      - name: 💾 Install (cargo-all-features) 💾
-        uses: actions-rs/install@v0.1
-        with:
-          crate: cargo-all-features
-          version: latest
-          use-tool-cache: true
+      - name: ✅ Checkout ✅
+        uses: actions/checkout@v4
+      - name: 🧰 Toolchain 🧰
+        run: |
+          rustup toolchain remove ${{ matrix.rust }}
+          rustup toolchain install ${{ matrix.rust }} --profile default --no-self-update
+          rustup default ${{ matrix.rust }}
+      - name: 💾 Install (cargo-binstall) 💾
+        uses: cargo-bins/cargo-binstall@main
+      - name: 💾 Install (all-features) 💾
         continue-on-error: true
+        run: cargo binstall --no-confirm --no-symlinks cargo-all-features
       - name: 🧪 Test 🧪
         run: cargo test-all-features
   test-windows:
     name: 🧪 Windows 🧪
-    needs: lints
+    needs: lints-windows
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -246,29 +251,17 @@ jobs:
           rust: nightly-gnu
           target: x86_64-pc-windows-gnu
     steps:
-      - name: ✔️ Checkout ✔️
-        uses: actions/checkout@v2
-        with:
-          submodules: recursive
-      - name: 💵 Cache 💵
-        uses: actions/cache@v2
-        with:
-          path: |
-            ~/.cargo/bin/cargo-*-all-features*
-          key: ${{ runner.os }}-${{ matrix.rust }}-${{ matrix.target }}-${{ hashFiles('**/Cargo.toml') }}
-      - uses: actions-rs/toolchain@v1
-        name: 🧰 Toolchain 🧰
-        with:
-          profile: minimal
-          toolchain: ${{ matrix.rust }}
-          target: ${{ matrix.target }}
-          override: true
-      - name: 💾 Install (cargo-all-features) 💾
-        uses: actions-rs/install@v0.1
-        with:
-          crate: cargo-all-features
-          version: latest
-          use-tool-cache: true
+      - name: ✅ Checkout ✅
+        uses: actions/checkout@v4
+      - name: 🧰 Toolchain 🧰
+        run: |
+          rustup toolchain remove ${{ matrix.rust }}
+          rustup toolchain install ${{ matrix.rust }} --profile default --no-self-update
+          rustup default ${{ matrix.rust }}
+      - name: 💾 Install (cargo-binstall) 💾
+        uses: cargo-bins/cargo-binstall@main
+      - name: 💾 Install (all-features) 💾
         continue-on-error: true
+        run: cargo binstall --no-confirm --no-symlinks cargo-all-features
       - name: 🧪 Test 🧪
         run: cargo test-all-features
