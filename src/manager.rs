@@ -58,11 +58,13 @@ mod test {
     use super::Mongodb;
     use anyhow::Result;
     use bb8::Pool;
+    use futures::pin_mut;
     use mongodb::{
         bson::doc,
         options::{ClientOptions, Credential},
     };
-    use std::env;
+    use std::{env, time::Duration};
+    use tokio::time::timeout;
 
     #[tokio::test]
     async fn new_works() -> Result<()> {
@@ -85,6 +87,31 @@ mod test {
         let doc = conn.run_command(doc! { "ping": 1 }, None).await?;
         // Check the result
         assert_eq!(doc! { "ok": 1 }, doc);
+        Ok(())
+    }
+
+    #[tokio::test]
+    async fn bad_connect_errors() -> Result<()> {
+        let mut client_options = ClientOptions::parse(env::var("BB8_MONGODB_URL")?).await?;
+        client_options.credential = Some(
+            Credential::builder()
+                .username(env::var("BB8_MONGODB_USER").ok())
+                .password(Some("not a password".to_string()))
+                .build(),
+        );
+        client_options.connect_timeout = Some(Duration::from_secs(3));
+        client_options.server_selection_timeout = Some(Duration::from_secs(3));
+
+        // Setup the `bb8-mongodb` connection manager
+        let connection_manager = Mongodb::new(client_options, "admin");
+        // Setup the `bb8` connection pool
+        let pool = Pool::builder().build(connection_manager).await?;
+        // Connect
+        let conn_fut = pool.get();
+        pin_mut!(conn_fut);
+        assert!(timeout(Duration::from_secs(5), &mut conn_fut)
+            .await
+            .is_err());
         Ok(())
     }
 }

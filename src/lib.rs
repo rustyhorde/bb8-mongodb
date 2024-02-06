@@ -107,7 +107,6 @@
         for_loops_over_fallibles,
         function_item_references,
         hidden_glob_reexports,
-        illegal_floating_point_literal_pattern,
         improper_ctypes,
         improper_ctypes_definitions,
         incomplete_features,
@@ -253,6 +252,9 @@
     all(nightly, feature = "unstable"),
     deny(rustdoc::missing_doc_code_examples)
 )]
+#![cfg_attr(all(doc, nightly), feature(doc_auto_cfg))]
+#![cfg_attr(all(docsrs, nightly), feature(doc_cfg))]
+#![cfg_attr(coverage_nightly, feature(coverage_attribute))]
 
 mod error;
 mod manager;
