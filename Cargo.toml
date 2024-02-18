@@ -11,7 +11,7 @@ name = "bb8-mongodb"
 readme = "README.md"
 repository = "https://github.com/rustyhorde/bb8-mongodb"
 version = "0.2.4"
-rust-version = "1.67.1"
+rust-version = "1.72.1"
 
 [package.metadata.cargo-all-features]
 denylist = ["unstable"]
