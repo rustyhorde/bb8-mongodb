@@ -34,6 +34,7 @@ impl Mongodb {
 }
 
 #[async_trait]
+#[allow(unused_qualifications)]
 impl ManageConnection for Mongodb {
     type Connection = Database;
     type Error = Error;
