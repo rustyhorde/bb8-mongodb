@@ -14,16 +14,13 @@ version = "0.2.4"
 rust-version = "1.72.1"
 
 [package.metadata.cargo-all-features]
-denylist = ["unstable"]
 skip_optional_dependencies = true
 
 [package.metadata.cargo-matrix]
 [[package.metadata.cargo-matrix.channel]]
 name = "default"
-always_deny = ["unstable"]
 
 [features]
-default = []
 unstable = []
 
 [dependencies]
