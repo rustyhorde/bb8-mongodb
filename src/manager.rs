@@ -45,7 +45,7 @@ impl ManageConnection for Mongodb {
     }
 
     async fn is_valid(&self, conn: &mut Self::Connection) -> Result<(), Self::Error> {
-        let _doc = conn.run_command(doc! { "ping": 1 }, None).await?;
+        let _doc = conn.run_command(doc! { "ping": 1 }).await?;
         Ok(())
     }
 
@@ -85,7 +85,7 @@ mod test {
         let conn = pool.get().await?;
         assert_eq!(conn.name(), "admin");
         // Run a command
-        let doc = conn.run_command(doc! { "ping": 1 }, None).await?;
+        let doc = conn.run_command(doc! { "ping": 1 }).await?;
         // Check the result
         assert_eq!(doc! { "ok": 1 }, doc);
         Ok(())

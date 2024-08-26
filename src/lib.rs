@@ -40,7 +40,7 @@
 //! let conn = pool.get().await?;
 //! assert_eq!(conn.name(), "admin");
 //! // Run a command
-//! let doc = conn.run_command(doc! { "ping": 1 }, None).await?;
+//! let doc = conn.run_command(doc! { "ping": 1 }).await?;
 //! // Check the result
 //! assert_eq!(doc! { "ok": 1 }, doc);
 //! # Ok(())
@@ -210,8 +210,7 @@
         useless_ptr_null_checks,
         variant_size_differences,
         wasm_c_abi,
-        while_true,
-        writes_through_immutable_pointer,
+        while_true
     )
 )]
 // If nightly and unstable, allow `incomplete_features` and `unstable_features`
