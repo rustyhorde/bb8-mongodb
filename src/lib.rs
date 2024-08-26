@@ -40,7 +40,7 @@
 //! let conn = pool.get().await?;
 //! assert_eq!(conn.name(), "admin");
 //! // Run a command
-//! let doc = conn.run_command(doc! { "ping": 1 }, None).await?;
+//! let doc = conn.run_command(doc! { "ping": 1 }).await?;
 //! // Check the result
 //! assert_eq!(doc! { "ok": 1 }, doc);
 //! # Ok(())
