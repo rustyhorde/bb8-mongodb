@@ -10,7 +10,7 @@ license = "MIT OR Apache-2.0"
 name = "bb8-mongodb"
 readme = "README.md"
 repository = "https://github.com/rustyhorde/bb8-mongodb"
-version = "0.2.4"
+version = "1.0.0"
 rust-version = "1.72.1"
 
 [package.metadata.cargo-all-features]
@@ -27,7 +27,7 @@ unstable = []
 anyhow = "1.0.79"
 async-trait = "0.1.77"
 bb8 = "0.8.3"
-mongodb = "2.8.0"
+mongodb = "3.0.1"
 thiserror = "1.0.56"
 tokio = { version = "1.35.1", features = ["full"] }
 
