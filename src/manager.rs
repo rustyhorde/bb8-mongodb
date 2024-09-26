@@ -68,6 +68,7 @@ mod test {
     use tokio::time::timeout;
 
     #[tokio::test]
+    #[allow(clippy::needless_return)]
     async fn new_works() -> Result<()> {
         let mut client_options = ClientOptions::parse(env::var("BB8_MONGODB_URL")?).await?;
         client_options.credential = Some(
@@ -92,6 +93,7 @@ mod test {
     }
 
     #[tokio::test]
+    #[allow(clippy::needless_return)]
     async fn bad_connect_errors() -> Result<()> {
         let mut client_options = ClientOptions::parse(env::var("BB8_MONGODB_URL")?).await?;
         client_options.credential = Some(
