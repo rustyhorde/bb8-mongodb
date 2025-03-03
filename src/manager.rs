@@ -39,16 +39,13 @@ impl ManageConnection for Mongodb {
     fn has_broken(&self, _conn: &mut Self::Connection) -> bool {
         false
     }
-    
+
     async fn connect(&self) -> Result<Self::Connection, Self::Error> {
         let client = Client::with_options(self.client_options.clone())?;
         Ok(client.database(&self.db_name))
     }
-    
-    async fn is_valid(
-        &self,
-        conn: &mut Self::Connection,
-    ) -> Result<(), Self::Error> {
+
+    async fn is_valid(&self, conn: &mut Self::Connection) -> Result<(), Self::Error> {
         let _doc = conn.run_command(doc! { "ping": 1 }).await?;
         Ok(())
     }
