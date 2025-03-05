@@ -9,7 +9,6 @@
 //! `bb8-mongodb` connection manager
 
 use crate::error::Error;
-use async_trait::async_trait;
 use bb8::ManageConnection;
 use mongodb::{bson::doc, options::ClientOptions, Client, Database};
 
@@ -33,11 +32,13 @@ impl Mongodb {
     }
 }
 
-#[async_trait]
-#[allow(unused_qualifications)]
 impl ManageConnection for Mongodb {
     type Connection = Database;
     type Error = Error;
+
+    fn has_broken(&self, _conn: &mut Self::Connection) -> bool {
+        false
+    }
 
     async fn connect(&self) -> Result<Self::Connection, Self::Error> {
         let client = Client::with_options(self.client_options.clone())?;
@@ -47,10 +48,6 @@ impl ManageConnection for Mongodb {
     async fn is_valid(&self, conn: &mut Self::Connection) -> Result<(), Self::Error> {
         let _doc = conn.run_command(doc! { "ping": 1 }).await?;
         Ok(())
-    }
-
-    fn has_broken(&self, _conn: &mut Self::Connection) -> bool {
-        false
     }
 }
 
