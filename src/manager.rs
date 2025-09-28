@@ -10,7 +10,7 @@
 
 use crate::error::Error;
 use bb8::ManageConnection;
-use mongodb::{bson::doc, options::ClientOptions, Client, Database};
+use mongodb::{Client, Database, bson::doc, options::ClientOptions};
 
 /// A `bb8` connection manager for the `MongoDB` database
 #[derive(Clone, Debug)]
@@ -109,9 +109,11 @@ mod test {
         // Connect
         let conn_fut = pool.get();
         pin_mut!(conn_fut);
-        assert!(timeout(Duration::from_secs(5), &mut conn_fut)
-            .await
-            .is_err());
+        assert!(
+            timeout(Duration::from_secs(5), &mut conn_fut)
+                .await
+                .is_err()
+        );
         Ok(())
     }
 }
