@@ -279,6 +279,7 @@
     deny(rustdoc::missing_doc_code_examples)
 )]
 #![cfg_attr(all(docsrs, nightly), feature(doc_cfg))]
+#![cfg_attr(coverage_nightly, feature(coverage_attribute))]
 
 mod error;
 mod manager;
